@@ -1,8 +1,9 @@
 const express = require('express');
-const { getUsers, getSingleUser,updateUser } = require('../controllers/user');
+const { getUsers, getSingleUser, updateUser, deleteUser } = require('../controllers/user');
+const { protect, authorize } = require('../middlewares/auth');
 const router = express.Router();
 
 router.route('/').get(getUsers);
-router.route('/:id').get(getSingleUser).put(updateUser)
+router.route('/:id').get(getSingleUser).put(protect, updateUser).delete(protect,deleteUser);
 
 module.exports = router;

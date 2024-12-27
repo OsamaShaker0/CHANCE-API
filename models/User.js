@@ -30,6 +30,11 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: [true, `please add your role in your company`],
   },
+  permission: {
+    type: String,
+    enum: ['user', 'publisher'],
+    default: 'user',
+  },
 
   companyName: {
     type: String,
@@ -50,7 +55,7 @@ UserSchema.pre('save', async function (next) {
 // compare password
 UserSchema.methods.comparePasswords = async function (password) {
   if (!this.isModified('password')) {
-    next();
+    return;
   }
   return await bcrypt.compare(password, this.password);
 };
