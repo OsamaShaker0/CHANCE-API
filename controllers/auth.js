@@ -3,7 +3,7 @@ const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 
 // @desc      register user
-// @route     POST api/v1/user/register
+// @route     POST api/v1/users/auth/register
 // @access    public
 exports.register = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
@@ -20,7 +20,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   res.status(201).json({ success: true, user: user, token });
 });
 // @desc      login user
-// @route     POST api/v1/user/login
+// @route     POST api/v1/users/auth/login
 // @access    public
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;

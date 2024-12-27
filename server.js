@@ -3,17 +3,18 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./db/connectDB');
 const notFound = require('./middlewares/notFound');
+// routes
 const authRoute = require('./routes/auth');
+const userRoute = require('./routes/user');
 const errorHandler = require('./middlewares/error');
 const app = express();
 
 app.use(express.json());
-app.use('/api/v1/auth', authRoute);
-app.use(errorHandler)
+app.use('/api/v1/users/auth', authRoute);
+app.use('/api/v1/users', userRoute);
 
-app.get('/', (req, res) => {
-  res.send('hi');
-});
+app.use(errorHandler);
+
 app.use(notFound);
 const PORT = process.env.PORT || 6000;
 const start = async () => {
