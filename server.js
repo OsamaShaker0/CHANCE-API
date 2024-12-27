@@ -4,10 +4,12 @@ const express = require('express');
 const connectDB = require('./db/connectDB');
 const notFound = require('./middlewares/notFound');
 const authRoute = require('./routes/auth');
+const errorHandler = require('./middlewares/error');
 const app = express();
 
 app.use(express.json());
 app.use('/api/v1/auth', authRoute);
+app.use(errorHandler)
 
 app.get('/', (req, res) => {
   res.send('hi');
