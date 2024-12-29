@@ -41,26 +41,30 @@ exports.updateChance = asyncHandler(async (req, res, next) => {
   if (!chance) {
     throw new ErrorResponse(`there are no chance with id of ${id}`, 400);
   }
-  if (chance._id.toString() !== userId) {
+
+  if (req.user.permission !== 'admin' && chance.user.toString() !== userId) {
     throw new ErrorResponse(`You are not allowed to access this route`, 401);
   }
   chance = await Chance.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
   });
-  res.status(200).json({success:true , updatedChance:chance})
+  res.status(200).json({ success: true, updatedChance: chance });
 });
-//   @decs
-//   @route
-//   @access
-exports.deleteChance = asyncHandler(async (req, res, next) => {});
 
-/*
-get chances 
-get single one 
-add
-update 
-delete 
-comment
-
- */
+//   @decs     delete chance
+//   @route    PUT/api/v1/chances/:id
+//   @access   private (only user which has token and made the chance)
+exports.deleteChance = asyncHandler(async (req, res, next) => {
+  const id = req.params.id;
+  const userId = req.user.id;
+  let chance = await Chance.findById(id);
+  if (!chance) {
+    throw new ErrorResponse(`there are no chance with id of ${id}`, 400);
+  }
+  if (chance.user.toString() !== userId && req.user.permission !== 'admin') {
+    throw new ErrorResponse(`You are not allowed to access this route`, 401);
+  }
+  chance = await Chance.findByIdAndDelete(id);
+  res.status(200).json({ success: true, deletedChance: chance });
+});

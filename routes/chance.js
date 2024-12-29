@@ -9,8 +9,11 @@ const {
 const { protect, authorize } = require('../middlewares/auth');
 const router = express.Router();
 
-router.route('/').get(getChances).post(protect,addChance);
-router.route('/:id').get(getChance);
+router.route('/').get(getChances).post(protect, addChance);
+router
+  .route('/:id')
+  .get(getChance)
+  .put(protect, updateChance)
+  .delete(protect, deleteChance);
 
 module.exports = router;
-//FIXME - do not forget to add authrize to all routes 

@@ -13,9 +13,11 @@ router.route('/').get(getUsers);
 router
   .route('/:id')
   .get(getSingleUser)
-  .put(protect, updateUser)
-  .delete(protect, deleteUser);
+  .put(protect, authorize('admin', 'user', 'publisher'), updateUser)
+  .delete(protect, authorize('admin', 'user', 'publisher'), deleteUser);
 
-router.route('/uploadphoto/:id').put( protect,uploadProfilePhoto);
+router
+  .route('/uploadphoto/:id')
+  .put(protect,authorize ('admin', 'user', 'publisher'), uploadProfilePhoto);
 
 module.exports = router;

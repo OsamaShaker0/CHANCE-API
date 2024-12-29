@@ -2,6 +2,7 @@ const User = require('../models/User');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 const path = require('path');
+const Chance = require('../models/Chance');
 
 // @desc    get all users
 // @route   GET/api/v1/users
@@ -29,9 +30,12 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const userId = req.user._id;
   let user = await User.findById(id);
+  if(!user){
+    return next(new ErrorResponse(`Not authrized to access this route `, 401));
+  }
   if (
     userId.toString() !== user._id.toString() &&
-    user.permission !== 'admin'
+    req.user.permission !== 'admin'
   ) {
     return next(new ErrorResponse(`Not authrized to access this route `, 401));
   }
@@ -48,13 +52,19 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const userId = req.user._id;
   let user = await User.findById(id);
+ 
+  if(!user){
+    return next(new ErrorResponse(`Not authrized to access this route `, 401));
+  }
   if (
     userId.toString() !== user._id.toString() &&
-    user.permission !== 'admin'
+    req.user.permission !== 'admin'
   ) {
     return next(new ErrorResponse(`Not authrized to access this route `, 401));
   }
-  //FIXME -  DO NOT FORGET TO DELETE ALL POSTS BEFORE DELETE
+
+ 
+  await Chance.deleteMany({ user: id });
   user = await User.findByIdAndDelete(id).select('name email role industry');
   res.status(200).json({ success: true, deletedUser: user });
 });

@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
-
+ //FIXME - do not forget to fix return password 
 // @desc      register user
 // @route     POST api/v1/users/auth/register
 // @access    public
