@@ -6,6 +6,7 @@ const notFound = require('./middlewares/notFound');
 // routes
 const authRoute = require('./routes/auth');
 const userRoute = require('./routes/user');
+const chanceRoute = require('./routes/chance');
 const errorHandler = require('./middlewares/error');
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(fileUpload());
 
 app.use('/api/v1/users/auth', authRoute);
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/chances', chanceRoute);
 
 app.use(errorHandler);
 
