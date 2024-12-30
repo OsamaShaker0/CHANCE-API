@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const randomStr = require('randomstring');
 const UserSchema = mongoose.Schema({
   name: {
     type: String,
@@ -45,18 +46,26 @@ const UserSchema = mongoose.Schema({
   photo: {
     type: String,
   },
+  resetPassword: {
+    type: String,
+    required: true,
+    default: 'No code',
+  },
 });
+
+//=======================
 // password crypt
 UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+  // generate salt
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
 // compare password
-UserSchema.methods.comparePasswords = async function (password) {
-  if (!this.isModified('password')) {
-    return;
-  }
+UserSchema.methods.compare = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
@@ -65,6 +74,13 @@ UserSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id, name: this.name }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
+};
+// create random string
+UserSchema.methods.resetPass = function () {
+  const random = randomStr.generate(7);
+  this.resetPassword = random;
+  this.save();
+  return this.resetPassword;
 };
 
 module.exports = mongoose.model('User', UserSchema);

@@ -1,7 +1,8 @@
 const User = require('../models/User');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
- //FIXME - do not forget to fix return password 
+const sendEmail = require('../utils/seneEmail');
+
 // @desc      register user
 // @route     POST api/v1/users/auth/register
 // @access    public
@@ -16,8 +17,20 @@ exports.register = asyncHandler(async (req, res, next) => {
     );
   }
   user = await User.create(req.body);
+
   const token = user.getSignedJwtToken();
-  res.status(201).json({ success: true, user: user, token });
+
+  res.status(201).json({
+    success: true,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      industry: user.industry,
+      role: user.role,
+    },
+    token,
+  });
 });
 // @desc      login user
 // @route     POST api/v1/users/auth/login
@@ -29,13 +42,83 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   let user = await User.findOne({ email });
+
   if (!user) {
     throw new ErrorResponse(`invalid credential`, 400);
   }
-  const isMatch = user.comparePasswords(password);
+
+  const isMatch = await user.compare(password);
+
   if (!isMatch) {
     throw new ErrorResponse(`invalid credential`, 400);
   }
   const token = user.getSignedJwtToken();
-  res.status(200).json({ success: true, user: user, token });
+  user.resetPassword = 'No code';
+  user.save();
+  res.status(200).json({
+    success: true,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      industry: user.industry,
+      role: user.role,
+    },
+    token,
+  });
+});
+
+// @desc      forgetPassowrd user
+// @route     POST api/v1/users/auth/forgetpassword
+// @access    public
+exports.forgetPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new ErrorResponse('please write your email account ', 400);
+  }
+  let user = await User.findOne({ email });
+  if (!user) {
+    throw new ErrorResponse('invalid credentials ', 400);
+  }
+  let options = {
+    from: 'oelgrem@hamil.com',
+    to: email,
+    subject: 'reset password',
+    text: `${user.resetPass()}`,
+  };
+  try {
+    await sendEmail(options);
+    return res.status(200).json({ success: true, data: 'Email sent' });
+  } catch (err) {
+    console.log(err);
+    user.resetPassword = undefined;
+
+    throw new ErrorResponse(`email could not be sent`, 500);
+  }
+});
+
+// @desc      resetPassword user
+// @route     POST api/v1/users/auth/resetpassword
+// @access    public
+
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+  const { email, code, newPassword } = req.body;
+  if ((!code || !newPassword, !email)) {
+    throw new ErrorResponse(`Bad request `, 400);
+  }
+  let user = await User.findOne({ email });
+  if (!user) {
+    throw new ErrorResponse('invalid credentials ', 400);
+  }
+
+  if (user.resetPassword !== code) {
+    throw new ErrorResponse(
+      'wrong code ,please make sure that is correct code ',
+      400
+    );
+  }
+  user.password = newPassword;
+  user.resetPassword = 'No code';
+  user.save();
+  return res.status(200).json({ success: true, msg: `password updated` });
 });
