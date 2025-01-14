@@ -5,11 +5,14 @@ const {
   updateUser,
   deleteUser,
   uploadProfilePhoto,
+
+  updatePassword,
 } = require('../controllers/user');
 const { protect, authorize } = require('../middlewares/auth');
 const router = express.Router();
 
 router.route('/').get(getUsers);
+router.route('/updatepassword').put(protect,updatePassword);
 router
   .route('/:id')
   .get(getSingleUser)
@@ -18,6 +21,6 @@ router
 
 router
   .route('/uploadphoto/:id')
-  .put(protect,authorize ('admin', 'user', 'publisher'), uploadProfilePhoto);
+  .put(protect, authorize('admin', 'user', 'publisher'), uploadProfilePhoto);
 
 module.exports = router;

@@ -65,8 +65,8 @@ UserSchema.pre('save', async function (next) {
 });
 
 // compare password
-UserSchema.methods.compare = async function (password) {
-  return await bcrypt.compare(password, this.password);
+UserSchema.methods.compare =  function (password) {
+  return  bcrypt.compareSync(password, this.password);
 };
 
 // create token

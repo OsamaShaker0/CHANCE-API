@@ -30,7 +30,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const userId = req.user._id;
   let user = await User.findById(id);
-  if(!user){
+  if (!user) {
     return next(new ErrorResponse(`Not authrized to access this route `, 401));
   }
   if (
@@ -52,8 +52,8 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const userId = req.user._id;
   let user = await User.findById(id);
- 
-  if(!user){
+
+  if (!user) {
     return next(new ErrorResponse(`Not authrized to access this route `, 401));
   }
   if (
@@ -63,12 +63,13 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Not authrized to access this route `, 401));
   }
 
- 
   await Chance.deleteMany({ user: id });
   user = await User.findByIdAndDelete(id).select('name email role industry');
   res.status(200).json({ success: true, deletedUser: user });
 });
-
+// @desc   upload photo
+// @route   PUT/api/v1/users/:id/uploadphoto
+// @access  private(admin or person him self)
 exports.uploadProfilePhoto = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const userId = req.user._id;
@@ -94,4 +95,25 @@ exports.uploadProfilePhoto = asyncHandler(async (req, res, next) => {
     await User.findByIdAndUpdate(id, { photo: file.name }, { new: true });
     return res.status(200).json({ sucess: true, data: file.name });
   });
+});
+
+// @desc   update  password
+// @route   PUT/api/v1/users/updatepassword
+// @access  private( person him self)
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    throw new ErrorResponse('please enter current and new  password', 400);
+  }
+  const currentUser = req.user;
+  const user = await User.findById(currentUser._id);
+
+  // check the pass
+  const isMatch = user.compare(currentPassword);
+  if (!isMatch) {
+    throw new ErrorResponse('wrong password', 400);
+  }
+  user.password = newPassword;
+  user.save();
+  res.status(201).json({ success: true, msg: 'password updated ' });
 });
