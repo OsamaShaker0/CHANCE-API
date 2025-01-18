@@ -83,15 +83,26 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
   if (!user) {
     throw new ErrorResponse('invalid credentials ', 400);
   }
+  let code = user.resetPass();
+  let url = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/auth/${email}/resetpassword`;
+
   let options = {
     from: 'oelgrem@hamil.com',
     to: email,
-    subject: 'reset password',
-    text: `${user.resetPass()}`,
+    subject: `reset password code `,
+    text: `
+     code is   ${code}
+      
+     use url to reset password   ${url}
+
+    
+  `,
   };
   try {
     await sendEmail(options);
-    return res.status(200).json({ success: true, data: 'Email sent' });
+    return res.status(200).json({ success: true, data: 'Email sent ' });
   } catch (err) {
     console.log(err);
     user.resetPassword = undefined;
@@ -105,7 +116,8 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
 // @access    public
 
 exports.resetPassword = asyncHandler(async (req, res, next) => {
-  const { email, code, newPassword } = req.body;
+  const email = req.params.email;
+  const { code, newPassword } = req.body;
   if ((!code || !newPassword, !email)) {
     throw new ErrorResponse(`Bad request `, 400);
   }
