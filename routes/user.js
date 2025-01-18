@@ -20,7 +20,7 @@ router
   .delete(protect, authorize('admin', 'user', 'publisher'), deleteUser);
 
 router
-  .route('/uploadphoto/:id')
+  .route('/:id/uploadphoto')
   .put(protect, authorize('admin', 'user', 'publisher'), uploadProfilePhoto);
 
 module.exports = router;
