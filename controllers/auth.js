@@ -2,6 +2,8 @@ const User = require('../models/User');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../utils/seneEmail');
+const Logger = require('../services/logger.service');
+const logger = new Logger('authController');
 
 // @desc      register user
 // @route     POST api/v1/users/auth/register
@@ -19,7 +21,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   user = await User.create(req.body);
 
   const token = user.getSignedJwtToken();
-
+  logger.info('the new user is register ');
   res.status(201).json({
     success: true,
     user: {
@@ -55,6 +57,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   const token = user.getSignedJwtToken();
   user.resetPassword = 'No code';
   user.save();
+  logger.info(`the user ${user.email} is logged `);
   res.status(200).json({
     success: true,
     user: {
