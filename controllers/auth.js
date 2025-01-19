@@ -13,15 +13,16 @@ exports.register = asyncHandler(async (req, res, next) => {
   let user = await User.findOne({ email });
 
   if (user) {
+    logger.info(`user with exist email ${email}  try to register `);
     throw new ErrorResponse(
-      `user with email of { ${email} } is already exsit`,
+      `user with email of { ${email} } is already exist`,
       400
     );
   }
   user = await User.create(req.body);
 
   const token = user.getSignedJwtToken();
-  logger.info('the new user is register ');
+  logger.info(`the new user is register with email ${email} `);
   res.status(201).json({
     success: true,
     user: {
@@ -50,8 +51,8 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   const isMatch = await user.compare(password);
-
   if (!isMatch) {
+    logger.info(`user with email ${email}  try wrong pass to login `);
     throw new ErrorResponse(`invalid credential`, 400);
   }
   const token = user.getSignedJwtToken();

@@ -39,6 +39,12 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   ) {
     return next(new ErrorResponse(`Not authrized to access this route `, 401));
   }
+  const password = req.body.password;
+  if (password) {
+    return next(
+      new ErrorResponse(`Can not update password from this route `, 401)
+    );
+  }
   user = await User.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
@@ -74,6 +80,9 @@ exports.uploadProfilePhoto = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const userId = req.user._id;
   let user = await User.findById(id);
+  if (!user) {
+    throw new ErrorResponse(`No user with id of ${userId}`);
+  }
   if (userId.toString() !== user._id.toString()) {
     return next(new ErrorResponse(`Not authrized to access this route `, 401));
   }
@@ -116,4 +125,31 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   user.password = newPassword;
   user.save();
   res.status(201).json({ success: true, msg: 'password updated ' });
+});
+// @desc   save  chances
+// @route   PUT/api/v1/users/savechance
+// @access  private( person him self)
+exports.savedChances = asyncHandler(async (req, res, next) => {
+  const chanceId = req.body.chanceId;
+  const user = req.user;
+  if (!chanceId) {
+    throw new ErrorResponse(`please add chance id`, 400);
+  }
+  const chance = await Chance.findById(chanceId);
+  if (!chance) {
+    throw new ErrorResponse(`please add chance id`, 400);
+  }
+  user.savedChances.push(chance._id);
+  user.save();
+  res.status(200).json({ success: true, data: 'chance saved' });
+});
+// @desc   get saved chances
+// @route   GET/api/v1/users/getchances
+// @access  private( person him self)
+exports.getSavedChances = asyncHandler(async (req, res, next) => {
+  const user = req.user;
+  console.log(user);
+  const chances = await User.find(user._id).select('savedChances');
+
+  res.status(200).json({ success: true, data: chances });
 });

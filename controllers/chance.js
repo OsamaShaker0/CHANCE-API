@@ -45,6 +45,9 @@ exports.updateChance = asyncHandler(async (req, res, next) => {
   if (req.user.permission !== 'admin' && chance.user.toString() !== userId) {
     throw new ErrorResponse(`You are not allowed to access this route`, 401);
   }
+  if(req.body.user){
+    throw new ErrorResponse(`Bad Request`, 401);
+  }
   chance = await Chance.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
