@@ -51,6 +51,9 @@ const UserSchema = mongoose.Schema({
     required: true,
     default: 'No code',
   },
+  savedChances:{
+    type:Array,
+  }
 });
 
 //=======================
@@ -65,8 +68,8 @@ UserSchema.pre('save', async function (next) {
 });
 
 // compare password
-UserSchema.methods.compare =  function (password) {
-  return  bcrypt.compareSync(password, this.password);
+UserSchema.methods.compare = function (password) {
+  return bcrypt.compareSync(password, this.password);
 };
 
 // create token
