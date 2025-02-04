@@ -10,13 +10,33 @@ const expressLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const hpp = require('hpp');
 const { xss } = require('express-xss-sanitizer');
+// swagger
+const swaggerUI = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Chance API',
+      version: '1.0.0',
+      description: 'simple express api to share and find job offers ',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000/',
+      },
+    ],
+  },
+  apis: ['./routes/*.js'],
+};
+const spec = swaggerJsdoc(options);
 // routes
 const authRoute = require('./routes/auth');
 const userRoute = require('./routes/user');
 const chanceRoute = require('./routes/chance');
 const errorHandler = require('./middlewares/error');
 const app = express();
-
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(spec));
 app.use(express.json());
 app.use(mongoSanitize());
 app.use(helmet());
