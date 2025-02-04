@@ -90,7 +90,7 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
   )}/api/v1/users/auth/${email}/resetpassword`;
 
   let options = {
-    from: 'oelgrem@hamil.com',
+    from: 'oelgrem@gamil.com',
     to: email,
     subject: `reset password code `,
     text: `
