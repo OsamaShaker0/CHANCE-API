@@ -8,7 +8,7 @@ const Chance = require('../models/Chance');
 // @route   GET/api/v1/users
 // @access  Public
 exports.getUsers = asyncHandler(async (req, res, next) => {
-  const users = await User.find({}).select('name email role industry');
+  const users = await User.find({}).select('name role industry');
 
   res.status(200).json({ success: true, numOfUsers: users.length, users });
 });
@@ -148,7 +148,6 @@ exports.savedChances = asyncHandler(async (req, res, next) => {
 // @access  private( person him self)
 exports.getSavedChances = asyncHandler(async (req, res, next) => {
   const user = req.user;
-  console.log(user);
   const chances = await User.find(user._id).select('savedChances');
 
   res.status(200).json({ success: true, data: chances });

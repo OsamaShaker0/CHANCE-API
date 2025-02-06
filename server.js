@@ -19,16 +19,30 @@ const options = {
     info: {
       title: 'Chance API',
       version: '1.0.0',
-      description: 'simple express api to share and find job offers ',
+      description: 'Simple express API to share and find job offers',
     },
     servers: [
       {
         url: 'http://localhost:3000/',
       },
     ],
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',  
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    
+    
   },
-  apis: ['./routes/*.js'],
+  apis: ['./routes/*.js'], 
 };
+
+
+
 const spec = swaggerJsdoc(options);
 // routes
 const authRoute = require('./routes/auth');
