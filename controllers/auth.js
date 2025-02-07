@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
-const sendEmail = require('../utils/seneEmail');
+const sendEmail = require('../utils/sendEmail');
 const Logger = require('../services/logger.service');
 const logger = new Logger('authController');
 

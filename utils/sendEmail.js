@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config()
 const ErrorResponse = require('./errorResponse');
 
 const sendEmail = async (options) => {
@@ -7,8 +8,8 @@ const sendEmail = async (options) => {
     port: 465,
     secure: true,
     auth: {
-      user: `oelgrem@gmail.com`,
-      pass: `fokwfioummpshuvm`,
+      user: process.env.EMAIL_AUTH_USER,
+      pass: process.env.EMAIL_AUTH_PASS
     },
   });
   let message = {
