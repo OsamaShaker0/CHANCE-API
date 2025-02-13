@@ -61,7 +61,10 @@ const limiter = expressLimit({ windowMs: 10 * 60 * 1000, max: 100 });
 app.use(limiter);
 app.use(xss());
 app.use(fileUpload());
-
+app.get('/',(req,res)=>{
+   let welcome = "<h1> Welcome to Chance API </h1> "
+  res.status(200).send(welcome)
+})
 app.use('/api/v1/users/auth', authRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/chances', chanceRoute);
